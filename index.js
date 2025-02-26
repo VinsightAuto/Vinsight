@@ -1,4 +1,4 @@
-document.getElementById("scan-button").addEventListener("click", () => {
+ document.getElementById("scan-button").addEventListener("click", () => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         alert("Your browser does not support camera access.");
         return;
