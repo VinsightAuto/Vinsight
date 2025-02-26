@@ -20,14 +20,16 @@ document.getElementById("scan-button").addEventListener("click", () => {
                     type: "LiveStream",
                     target: video, // Attach video stream
                     constraints: {
-                        width: 640,
-                        height: 480,
+                        width: 1280, // Higher resolution for better detection
+                        height: 720,
                         facingMode: "environment" // Use rear camera
                     }
                 },
                 decoder: {
-                    readers: ["code_128_reader"] // VIN barcodes use Code 128
-                }
+                    readers: ["code_128_reader"], // VIN barcodes use Code 128
+                },
+                locate: true, // Helps find the barcode in the image
+                debug: true // Enables debugging mode
             }, function(err) {
                 if (err) {
                     console.error("QuaggaJS Error:", err);
@@ -46,6 +48,7 @@ document.getElementById("scan-button").addEventListener("click", () => {
                 Quagga.stop();
                 stream.getTracks().forEach(track => track.stop());
                 video.remove();
+                alert("VIN Scanned: " + scannedVin); // Alert to confirm detection
             });
 
         })
