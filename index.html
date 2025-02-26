@@ -4,9 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vinsight Auto</title>
+    <link rel="stylesheet" href="style.css"> <!-- Link to the new CSS file -->
+    <script defer src="index.js"></script> <!-- JavaScript for VIN scanner -->
 </head>
 <body>
-    <h1>Welcome to Vinsight Auto</h1>
-    <p>Scan your VIN barcode below:</p>
+
+    <h1>Want to Sell Your Car?</h1>
+    <p>Get an instant appraisal in minutes</p>
+
+    <div class="container">
+        <button id="scan-button">Scan VIN</button>
+        <input type="text" id="vin-input" placeholder="VIN Number" readonly>
+
+        <form id="user-form">
+            <input type="number" placeholder="Mileage" required>
+            <input type="text" placeholder="Full Name" required>
+            <input type="text" placeholder="Phone or Email" required>
+            <button type="submit">Get My Offer</button>
+        </form>
+    </div>
+
 </body>
 </html>
