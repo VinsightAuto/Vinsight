@@ -19,14 +19,27 @@ document.getElementById("scan-button").addEventListener("click", () => {
             video.srcObject = stream;
             video.play();
 
+            // Create a scan overlay (rectangle)
+            let overlay = document.createElement("div");
+            overlay.style.position = "fixed";
+            overlay.style.top = "30%";
+            overlay.style.left = "50%";
+            overlay.style.transform = "translate(-50%, -50%)";
+            overlay.style.width = "80%";
+            overlay.style.height = "20%";
+            overlay.style.border = "4px solid red";
+            overlay.style.borderRadius = "5px";
+            overlay.style.zIndex = "9999";
+            document.body.appendChild(overlay);
+
             // Initialize QuaggaJS for barcode scanning
             Quagga.init({
                 inputStream: {
                     name: "Live",
                     type: "LiveStream",
-                    target: video, // Attach video stream
+                    target: video,
                     constraints: {
-                        width: 1280, // High resolution for better detection
+                        width: 1280,
                         height: 720,
                         facingMode: "environment"
                     }
@@ -35,9 +48,9 @@ document.getElementById("scan-button").addEventListener("click", () => {
                     readers: ["code_128_reader"] // VIN barcodes use Code 128
                 },
                 locate: true,
-                numOfWorkers: 2, // Optimized for mobile performance
+                numOfWorkers: 2,
                 locator: {
-                    patchSize: "medium", // Can be "x-small", "small", "medium", "large", "x-large"
+                    patchSize: "medium",
                     halfSample: false
                 }
             }, function(err) {
@@ -49,25 +62,20 @@ document.getElementById("scan-button").addEventListener("click", () => {
                 Quagga.start();
             });
 
-            // Add a visual indicator for debugging
+            // Add a detection overlay for debugging
             Quagga.onProcessed(function(result) {
                 let drawingCtx = Quagga.canvas.ctx.overlay;
                 let drawingCanvas = Quagga.canvas.dom.overlay;
 
                 if (result) {
+                    drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
                     if (result.boxes) {
-                        drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
                         result.boxes.forEach((box) => {
                             Quagga.ImageDebug.drawPath(box, { x: 0, y: 1 }, drawingCtx, {
                                 color: "blue",
                                 lineWidth: 2
                             });
                         });
-                    }
-                    if (result.codeResult && result.codeResult.code) {
-                        drawingCtx.font = "24px Arial";
-                        drawingCtx.fillStyle = "red";
-                        drawingCtx.fillText(result.codeResult.code, 10, 20);
                     }
                 }
             });
@@ -81,7 +89,8 @@ document.getElementById("scan-button").addEventListener("click", () => {
                 Quagga.stop();
                 stream.getTracks().forEach(track => track.stop());
                 video.remove();
-                alert("VIN Scanned: " + scannedVin); // Alert to confirm detection
+                overlay.remove();
+                alert("VIN Scanned: " + scannedVin);
             });
 
         })
