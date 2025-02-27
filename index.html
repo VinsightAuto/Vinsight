@@ -1,32 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
-<script>
-    function loadDynamsoft() {
-        let script = document.createElement("script");
-        script.src = "https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader@10.2.2/dist/dbr.js";
-        script.onload = () => console.log("✅ Dynamsoft Loaded via CDN");
-        script.onerror = () => {
-            console.error("❌ Failed to load from CDN. Trying local backup...");
-            let localScript = document.createElement("script");
-            localScript.src = "/dbr.js"; // Make sure this file exists in your repo
-            document.head.appendChild(localScript);
-        };
-        document.head.appendChild(script);
-    }
-    loadDynamsoft();
-</script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sell Your Car</title>
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@10.2.2/dist/dbr.js"></script>
+    <script>
+        Dynamsoft.BarcodeReader.license = "DLS2eyJoYW5kc2hha2VDb2RlIjoiMTAzNzQ1OTg5LVRYbFhaV0pRY205cSIsIm1haW5TZXJ2ZXJVUkwiOiJodHRwczovL21kbHMuZHluYW1zb2Z0b25saW5lLmNvbSIsIm9yZ2FuaXphdGlvbklEIjoiMTAzNzQ1OTg5Iiwic3RhbmRieVNlcnZlclVSTCI6Imh0dHBzOi8vc2Rscy5keW5hbXNvZnRvbmxpbmUuY29tIiwiY2hlY2tDb2RlIjoyMjczOTc0NTJ9";
 
+        async function scanVIN() {
+            try {
+                if (!Dynamsoft || !Dynamsoft.BarcodeReader) {
+                    alert("Dynamsoft library failed to load. Refresh and try again.");
+                    return;
+                }
+
+                const scanner = await Dynamsoft.BarcodeScanner.createInstance();
+                scanner.setUIElement(document.createElement("div")); // Prevent UI overlay issues
+                scanner.onFrameRead = results => {
+                    for (let result of results) {
+                        console.log("VIN Scanned: ", result.barcodeText);
+                        document.getElementById("vin-input").value = result.barcodeText;
+                        alert("VIN Scanned: " + result.barcodeText);
+                        scanner.hide();
+                        scanner.destroy();
+                        break;
+                    }
+                };
+
+                await scanner.show();
+            } catch (err) {
+                alert("Error accessing camera: " + err.message);
+                console.error("Camera error:", err);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("scan-button").addEventListener("click", scanVIN);
+        });
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .button {
+            width: 100%;
+            padding: 10px;
+            background: black;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
 <body>
-    <div class="container">
-        <h2>Want to Sell Your Car?</h2>
-        <p>Get an instant appraisal in minutes</p>
-        <button id="scan-button">Scan VIN</button>
-        <input type="text" id="vin-input" placeholder="Enter or Scan VIN Number">
-        <input type="text" id="mileage" placeholder="Mileage">
-        <input type="text" id="full-name" placeholder="Full Name">
-        <input type="text" id="contact" placeholder="Phone or Email">
-        <button id="submit-button">Get My Offer</button>
-        <div id="debug-output"></div>
-    </div>
+
+<div class="container">
+    <h2>Want to Sell Your Car?</h2>
+    <p>Get an instant appraisal in minutes</p>
+    
+    <button id="scan-button" class="button">Scan VIN</button>
+    <input id="vin-input" class="input-field" type="text" placeholder="Enter or Scan VIN Number">
+    <input id="mileage-input" class="input-field" type="text" placeholder="Mileage">
+    <input id="name-input" class="input-field" type="text" placeholder="Full Name">
+    <input id="contact-input" class="input-field" type="text" placeholder="Phone or Email">
+
+    <button id="submit-button" class="button">Get My Offer</button>
+</div>
+
 </body>
 </html>
