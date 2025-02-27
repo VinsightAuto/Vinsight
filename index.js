@@ -32,28 +32,29 @@ document.getElementById("scan-button").addEventListener("click", () => {
             overlay.style.zIndex = "9999";
             document.body.appendChild(overlay);
 
-            // Initialize QuaggaJS with better barcode detection settings
+            // Initialize QuaggaJS for barcode scanning
             Quagga.init({
                 inputStream: {
                     name: "Live",
                     type: "LiveStream",
                     target: video,
                     constraints: {
-                        width: 1280, // High resolution for better detection
+                        width: 1280, 
                         height: 720,
                         facingMode: "environment"
                     }
                 },
                 decoder: {
-                    readers: ["code_128_reader", "ean_reader", "ean_8_reader"]
+                    readers: ["code_128_reader"]
                 },
                 locate: true,
                 numOfWorkers: 2,
-                frequency: 10, // Force continuous scanning
+                frequency: 10, 
                 locator: {
                     patchSize: "medium",
                     halfSample: false
-                }
+                },
+                debug: true
             }, function(err) {
                 if (err) {
                     console.error("QuaggaJS Error:", err);
@@ -61,9 +62,10 @@ document.getElementById("scan-button").addEventListener("click", () => {
                     return;
                 }
                 Quagga.start();
+                console.log("QuaggaJS started scanning...");
             });
 
-            // Add debugging logs to check if Quagga is recognizing anything
+            // Debugging: Show detection frames
             Quagga.onProcessed(function(result) {
                 let drawingCtx = Quagga.canvas.ctx.overlay;
                 let drawingCanvas = Quagga.canvas.dom.overlay;
@@ -78,12 +80,17 @@ document.getElementById("scan-button").addEventListener("click", () => {
                             });
                         });
                     }
+                    if (result.codeResult && result.codeResult.code) {
+                        console.log("Potential barcode detected:", result.codeResult.code);
+                    } else {
+                        console.log("No barcode detected in frame.");
+                    }
                 }
             });
 
             // Process barcode when detected
             Quagga.onDetected(function(result) {
-                console.log("Barcode detected:", result.codeResult.code);
+                console.log("Barcode successfully detected:", result.codeResult.code);
                 let scannedVin = result.codeResult.code;
                 document.getElementById("vin-input").value = scannedVin;
 
