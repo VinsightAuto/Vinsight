@@ -32,23 +32,24 @@ document.getElementById("scan-button").addEventListener("click", () => {
             overlay.style.zIndex = "9999";
             document.body.appendChild(overlay);
 
-            // Initialize QuaggaJS for barcode scanning
+            // Initialize QuaggaJS with better barcode detection settings
             Quagga.init({
                 inputStream: {
                     name: "Live",
                     type: "LiveStream",
                     target: video,
                     constraints: {
-                        width: 1280,
+                        width: 1280, // High resolution for better detection
                         height: 720,
                         facingMode: "environment"
                     }
                 },
                 decoder: {
-                    readers: ["code_128_reader"] // VIN barcodes use Code 128
+                    readers: ["code_128_reader", "ean_reader", "ean_8_reader"]
                 },
                 locate: true,
                 numOfWorkers: 2,
+                frequency: 10, // Force continuous scanning
                 locator: {
                     patchSize: "medium",
                     halfSample: false
@@ -62,7 +63,7 @@ document.getElementById("scan-button").addEventListener("click", () => {
                 Quagga.start();
             });
 
-            // Add a detection overlay for debugging
+            // Add debugging logs to check if Quagga is recognizing anything
             Quagga.onProcessed(function(result) {
                 let drawingCtx = Quagga.canvas.ctx.overlay;
                 let drawingCanvas = Quagga.canvas.dom.overlay;
@@ -82,6 +83,7 @@ document.getElementById("scan-button").addEventListener("click", () => {
 
             // Process barcode when detected
             Quagga.onDetected(function(result) {
+                console.log("Barcode detected:", result.codeResult.code);
                 let scannedVin = result.codeResult.code;
                 document.getElementById("vin-input").value = scannedVin;
 
