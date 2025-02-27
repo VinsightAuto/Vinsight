@@ -3,82 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sell Your Car</title>
+    <title>VIN Scanner</title>
 
-    <!-- Dynamsoft Barcode Scanner -->
-    <script>
-        (async function loadDynamsoft() {
-            try {
-                console.log("Loading Dynamsoft...");
-                const script = document.createElement("script");
-                script.src = "https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@10.4.0/dist/dbr.js";
-                script.async = true;
+    <!-- Add the Dynamsoft Barcode Reader Library -->
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader@10.4.2/dist/dbr.js"></script>
 
-                script.onload = async () => {
-                    console.log("✅ Dynamsoft Library Loaded Successfully");
-                    Dynamsoft.BarcodeReader.license = "YOUR_LICENSE_KEY_HERE";
-                    await Dynamsoft.BarcodeReader.loadWasm();
-                };
-
-                script.onerror = () => {
-                    console.error("❌ Error: Dynamsoft library failed to load.");
-                    alert("Error: Barcode scanner library failed to load.");
-                };
-
-                document.head.appendChild(script);
-            } catch (error) {
-                console.error("Error loading barcode scanner:", error);
-            }
-        })();
-    </script>
-</head>
-
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f4f4f4;
-        }
-        .container {
-            margin: auto;
-            width: 90%;
-            max-width: 400px;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            background: black;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-    </style>
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
     <div class="container">
-        <h2>Want to Sell Your Car?</h2>
+        <h1>Want to Sell Your Car?</h1>
         <p>Get an instant appraisal in minutes</p>
+
         <button id="scan-button">Scan VIN</button>
+
         <input type="text" id="vin-input" placeholder="Enter or Scan VIN Number">
         <input type="text" id="mileage" placeholder="Mileage">
-        <input type="text" id="name" placeholder="Full Name">
-        <input type="text" id="contact" placeholder="Phone or Email">
+        <input type="text" id="full-name" placeholder="Full Name">
+        <input type="text" id="contact-info" placeholder="Phone or Email">
+        
         <button id="submit-button">Get My Offer</button>
     </div>
-    <script src="index.js"></script>
+
+    <!-- JavaScript -->
+    <script>
+        document.getElementById("scan-button").addEventListener("click", async () => {
+            try {
+                // Check if Dynamsoft library is loaded
+                if (typeof Dynamsoft === "undefined" || !Dynamsoft.BarcodeReader) {
+                    alert("Error: Barcode scanner library failed to load.");
+                    console.error("Dynamsoft is not available.");
+                    return;
+                }
+
+                console.log("Dynamsoft Loaded Successfully");
+
+                // Set API Key
+                Dynamsoft.BarcodeReader.license = "DLS2eyJoYW5kc2hha2VDb2RlIjoiMTAzNzQ1OTg5LVRYbFhaV0pRY205cSIsIm1haW5TZXJ2ZXJVUkwiOiJodHRwczovL21kbHMuZHluYW1zb2Z0b25saW5lLmNvbSIsIm9yZ2FuaXphdGlvbklEIjoiMTAzNzQ1OTg5Iiwic3RhbmRieVNlcnZlclVSTCI6Imh0dHBzOi8vc2Rscy5keW5hbXNvZnRvbmxpbmUuY29tIiwiY2hlY2tDb2RlIjoyMjczOTc0NTJ9";
+
+                // Wait for the library to initialize
+                await Dynamsoft.BarcodeReader.loadWasm();
+
+                // Create a scanner instance
+                let scanner = await Dynamsoft.BarcodeScanner.createInstance();
+
+                // Set barcode formats
+                await scanner.updateRuntimeSettings("speed");
+                await scanner.setBarcodeFormats([
+                    Dynamsoft.EnumBarcodeFormat.BF_CODE_39,
+                    Dynamsoft.EnumBarcodeFormat.BF_CODE_128,
+                    Dynamsoft.EnumBarcodeFormat.BF_DATAMATRIX,
+                    Dynamsoft.EnumBarcodeFormat.BF_QR_CODE,
+                    Dynamsoft.EnumBarcodeFormat.BF_AZTEC
+                ]);
+
+                // Open the scanner
+                await scanner.show();
+
+                // Process barcode when detected
+                scanner.onFrameRead = (results) => {
+                    for (let result of results) {
+                        console.log("VIN Scanned: ", result.barcodeText);
+                        document.getElementById("vin-input").value = result.barcodeText;
+                        alert("VIN Scanned: " + result.barcodeText);
+                        scanner.hide();
+                        scanner.destroy();
+                        break;
+                    }
+                };
+
+            } catch (err) {
+                alert("Error accessing camera: " + err.message);
+                console.error("Camera error:", err);
+            }
+        });
+    </script>
+
 </body>
 </html>
