@@ -5,11 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VIN Scanner</title>
 
-    <!-- Add the Dynamsoft Barcode Reader Library -->
+    <!-- Dynamsoft Barcode Reader Library -->
     <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader@10.4.2/dist/dbr.js"></script>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            text-align: center;
+            padding: 50px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: auto;
+        }
+        h1 {
+            font-size: 24px;
+        }
+        p {
+            font-size: 14px;
+            color: #666;
+        }
+        button {
+            background-color: black;
+            color: white;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #333;
+        }
+        input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
 
@@ -31,10 +75,10 @@
     <script>
         document.getElementById("scan-button").addEventListener("click", async () => {
             try {
-                // Check if Dynamsoft library is loaded
+                // Check if Dynamsoft is available
                 if (typeof Dynamsoft === "undefined" || !Dynamsoft.BarcodeReader) {
                     alert("Error: Barcode scanner library failed to load.");
-                    console.error("Dynamsoft is not available.");
+                    console.error("Dynamsoft library is missing.");
                     return;
                 }
 
@@ -43,7 +87,7 @@
                 // Set API Key
                 Dynamsoft.BarcodeReader.license = "DLS2eyJoYW5kc2hha2VDb2RlIjoiMTAzNzQ1OTg5LVRYbFhaV0pRY205cSIsIm1haW5TZXJ2ZXJVUkwiOiJodHRwczovL21kbHMuZHluYW1zb2Z0b25saW5lLmNvbSIsIm9yZ2FuaXphdGlvbklEIjoiMTAzNzQ1OTg5Iiwic3RhbmRieVNlcnZlclVSTCI6Imh0dHBzOi8vc2Rscy5keW5hbXNvZnRvbmxpbmUuY29tIiwiY2hlY2tDb2RlIjoyMjczOTc0NTJ9";
 
-                // Wait for the library to initialize
+                // Wait for library to initialize
                 await Dynamsoft.BarcodeReader.loadWasm();
 
                 // Create a scanner instance
@@ -59,10 +103,10 @@
                     Dynamsoft.EnumBarcodeFormat.BF_AZTEC
                 ]);
 
-                // Open the scanner
+                // Open scanner
                 await scanner.show();
 
-                // Process barcode when detected
+                // Handle barcode scanning
                 scanner.onFrameRead = (results) => {
                     for (let result of results) {
                         console.log("VIN Scanned: ", result.barcodeText);
