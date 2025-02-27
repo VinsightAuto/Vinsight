@@ -1,14 +1,12 @@
 document.getElementById("scan-button").addEventListener("click", async () => {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        alert("Your browser does not support camera access.");
+    if (typeof ZXing === "undefined") {
+        alert("Barcode scanner failed to load. Please refresh and try again.");
         return;
     }
 
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-
-        // Create video element
-        let video = document.createElement("video");
+        const codeReader = new ZXing.BrowserBarcodeReader();
+        const video = document.createElement("video");
         video.setAttribute("playsinline", true);
         video.style.position = "fixed";
         video.style.top = "50%";
@@ -17,6 +15,8 @@ document.getElementById("scan-button").addEventListener("click", async () => {
         video.style.width = "100%";
         video.style.height = "100%";
         document.body.appendChild(video);
+
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
         video.srcObject = stream;
         video.play();
 
@@ -32,9 +32,6 @@ document.getElementById("scan-button").addEventListener("click", async () => {
         overlay.style.borderRadius = "5px";
         overlay.style.zIndex = "9999";
         document.body.appendChild(overlay);
-
-        // Load ZXing barcode reader
-        const codeReader = new ZXing.BrowserBarcodeReader();
 
         codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
             if (result) {
