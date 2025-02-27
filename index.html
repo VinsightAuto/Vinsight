@@ -4,24 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sell Your Car</title>
-    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@10.2.1/dist/dbr.js"></script>
-    <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sell Your Car</title>
 
-    <!-- Dynamsoft Barcode Scanner Alternative CDN -->
+    <!-- Dynamsoft Barcode Scanner -->
     <script>
         (async function loadDynamsoft() {
             try {
                 console.log("Loading Dynamsoft...");
                 const script = document.createElement("script");
-                script.src = "https://unpkg.com/dynamsoft-javascript-barcode@10.4.0/dist/dbr.js"; // Alternative CDN
+                script.src = "https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@10.4.0/dist/dbr.js";
                 script.async = true;
 
                 script.onload = async () => {
                     console.log("✅ Dynamsoft Library Loaded Successfully");
-                    Dynamsoft.BarcodeReader.license = "YOUR_LICENSE_KEY_HERE"; // Replace with your actual license key
+                    Dynamsoft.BarcodeReader.license = "YOUR_LICENSE_KEY_HERE";
                     await Dynamsoft.BarcodeReader.loadWasm();
                 };
 
@@ -37,6 +32,7 @@
         })();
     </script>
 </head>
+
 
     <style>
         body {
