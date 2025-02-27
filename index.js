@@ -1,17 +1,21 @@
 document.getElementById("scan-button").addEventListener("click", async () => {
-    if (typeof ZXing === "undefined" || !ZXing.BrowserBarcodeReader) {
+    if (typeof ZXing === "undefined" || !ZXing.BrowserMultiFormatReader) {
         alert("Barcode scanner failed to load. Please refresh and try again.");
         console.error("ZXing is not defined. Make sure it's loaded before index.js runs.");
         return;
     }
 
     try {
-        const codeReader = new ZXing.BrowserBarcodeReader();
+        const codeReader = new ZXing.BrowserMultiFormatReader(); // Supports multiple barcode types
         
-        // Force ZXing to only detect Code 39 (most common VIN barcode format)
+        // Force ZXing to scan all common VIN barcode formats
         const hints = new Map();
         hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
-            ZXing.BarcodeFormat.CODE_39 // VIN barcodes are usually Code 39
+            ZXing.BarcodeFormat.CODE_39,     // Common VIN format
+            ZXing.BarcodeFormat.CODE_128,    // Used in some VINs
+            ZXing.BarcodeFormat.DATA_MATRIX, // Sometimes used on newer vehicles
+            ZXing.BarcodeFormat.QR_CODE,     // Some manufacturers use QR codes
+            ZXing.BarcodeFormat.AZTEC        // Some high-security VIN labels
         ]);
 
         const video = document.createElement("video");
@@ -24,7 +28,14 @@ document.getElementById("scan-button").addEventListener("click", async () => {
         video.style.height = "100%";
         document.body.appendChild(video);
 
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: "environment",
+                width: { ideal: 1920 },
+                height: { ideal: 1080 }
+            }
+        });
+
         video.srcObject = stream;
         video.play();
 
@@ -41,6 +52,7 @@ document.getElementById("scan-button").addEventListener("click", async () => {
         overlay.style.zIndex = "9999";
         document.body.appendChild(overlay);
 
+        // Start scanning
         codeReader.decodeFromVideoDevice(undefined, video, (result, err) => {
             if (result) {
                 console.log("VIN Scanned:", result.text);
@@ -55,7 +67,7 @@ document.getElementById("scan-button").addEventListener("click", async () => {
             } else if (err) {
                 console.log("Scanning... No VIN barcode detected yet.");
             }
-        }, hints);  // 👈 Pass barcode format hints for VIN detection
+        }, hints);
 
     } catch (err) {
         alert("Error accessing camera: " + err.message);
