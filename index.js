@@ -1,103 +1,40 @@
-document.getElementById("scan-button").addEventListener("click", () => {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        alert("Your browser does not support camera access.");
-        return;
-    }
+document.getElementById("scan-button").addEventListener("click", async () => {
+    try {
+        // Ensure the API key is set (replace "YOUR_API_KEY_HERE" with your actual key)
+        Dynamsoft.BarcodeReader.license = "DLS2eyJoYW5kc2hha2VDb2RlIjoiMTAzNzQ1OTg5LVRYbFhaV0pRY205cSIsIm1haW5TZXJ2ZXJVUkwiOiJodHRwczovL21kbHMuZHluYW1zb2Z0b25saW5lLmNvbSIsIm9yZ2FuaXphdGlvbklEIjoiMTAzNzQ1OTg5Iiwic3RhbmRieVNlcnZlclVSTCI6Imh0dHBzOi8vc2Rscy5keW5hbXNvZnRvbmxpbmUuY29tIiwiY2hlY2tDb2RlIjoyMjczOTc0NTJ9";
 
-    // Open the camera stream
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-        .then((stream) => {
-            let video = document.createElement("video");
-            video.setAttribute("playsinline", true);
-            video.style.position = "fixed";
-            video.style.top = "50%";
-            video.style.left = "50%";
-            video.style.transform = "translate(-50%, -50%)";
-            video.style.width = "100%";
-            video.style.height = "100%";
-            document.body.appendChild(video);
-            video.srcObject = stream;
-            video.play();
+        // Create barcode scanner instance
+        let scanner = await Dynamsoft.BarcodeScanner.createInstance();
 
-            // Create a scan overlay (rectangle)
-            let overlay = document.createElement("div");
-            overlay.style.position = "fixed";
-            overlay.style.top = "30%";
-            overlay.style.left = "50%";
-            overlay.style.transform = "translate(-50%, -50%)";
-            overlay.style.width = "80%";
-            overlay.style.height = "20%";
-            overlay.style.border = "4px solid red";
-            overlay.style.borderRadius = "5px";
-            overlay.style.zIndex = "9999";
-            document.body.appendChild(overlay);
+        // Set barcode formats (supports all VIN types)
+        await scanner.updateRuntimeSettings("speed");
+        await scanner.setBarcodeFormats([
+            Dynamsoft.EnumBarcodeFormat.BF_CODE_39, 
+            Dynamsoft.EnumBarcodeFormat.BF_CODE_128,
+            Dynamsoft.EnumBarcodeFormat.BF_DATAMATRIX,
+            Dynamsoft.EnumBarcodeFormat.BF_QR_CODE,
+            Dynamsoft.EnumBarcodeFormat.BF_AZTEC
+        ]);
 
-            // Load Quagga2
-            Quagga.init({
-                inputStream: {
-                    name: "Live",
-                    type: "LiveStream",
-                    target: video,
-                    constraints: {
-                        width: 1920,
-                        height: 1080,
-                        facingMode: "environment"
-                    }
-                },
-                decoder: {
-                    readers: ["code_39_reader", "code_128_reader"], // VIN barcode formats
-                    multiple: false
-                },
-                locate: true,
-                numOfWorkers: 2,
-                locator: {
-                    patchSize: "medium",
-                    halfSample: false
-                }
-            }, function(err) {
-                if (err) {
-                    console.error("Quagga2 Error:", err);
-                    alert("Error initializing barcode scanner.");
-                    return;
-                }
-                Quagga.start();
-                console.log("Quagga2 started scanning...");
-            });
+        // Open the scanner
+        await scanner.show();
 
-            // Highlight detected barcodes
-            Quagga.onProcessed(function(result) {
-                let drawingCtx = Quagga.canvas.ctx.overlay;
-                let drawingCanvas = Quagga.canvas.dom.overlay;
-
-                if (result) {
-                    drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
-                    if (result.boxes) {
-                        result.boxes.forEach((box) => {
-                            Quagga.ImageDebug.drawPath(box, { x: 0, y: 1 }, drawingCtx, {
-                                color: "blue",
-                                lineWidth: 2
-                            });
-                        });
-                    }
-                }
-            });
-
-            // Process barcode when detected
-            Quagga.onDetected(function(result) {
-                let scannedVin = result.codeResult.code;
-                document.getElementById("vin-input").value = scannedVin;
+        // Process barcode when detected
+        scanner.onFrameRead = (results) => {
+            for (let result of results) {
+                console.log("VIN Scanned:", result.barcodeText);
+                document.getElementById("vin-input").value = result.barcodeText;
 
                 // Stop scanner after successful scan
-                Quagga.stop();
-                stream.getTracks().forEach(track => track.stop());
-                video.remove();
-                overlay.remove();
-                alert("VIN Scanned: " + scannedVin);
-            });
+                scanner.hide();
+                scanner.destroy();
+                alert("VIN Scanned: " + result.barcodeText);
+                break;
+            }
+        };
 
-        })
-        .catch((err) => {
-            alert("Error accessing camera: " + err.message);
-            console.error("Camera error:", err);
-        });
+    } catch (err) {
+        alert("Error accessing camera: " + err.message);
+        console.error("Camera error:", err);
+    }
 });
