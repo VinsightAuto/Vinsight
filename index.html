@@ -5,26 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sell Your Car</title>
     <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@10.2.1/dist/dbr.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", async () => {
-            try {
-                console.log("Dynamsoft script loaded.");
-                
-                if (typeof Dynamsoft === "undefined") {
-                    console.error("Dynamsoft is not available. Script failed to load.");
-                    alert("Error: Barcode scanner library failed to load.");
-                    return;
-                }
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sell Your Car</title>
 
-                Dynamsoft.BarcodeReader.license = "DLS2eyJoYW5kc2hha2VDb2RlIjoiMTAzNzQ1OTg5LVRYbFhaV0pRY205cSIsIm1haW5TZXJ2ZXJVUkwiOiJodHRwczovL21kbHMuZHluYW1zb2Z0b25saW5lLmNvbSIsIm9yZ2FuaXphdGlvbklEIjoiMTAzNzQ1OTg5Iiwic3RhbmRieVNlcnZlclVSTCI6Imh0dHBzOi8vc2Rscy5keW5hbXNvZnRvbmxpbmUuY29tIiwiY2hlY2tDb2RlIjoyMjczOTc0NTJ9";
-                await Dynamsoft.BarcodeReader.loadWasm();
-                console.log("Dynamsoft successfully initialized.");
+    <!-- Dynamsoft Barcode Scanner Alternative CDN -->
+    <script>
+        (async function loadDynamsoft() {
+            try {
+                console.log("Loading Dynamsoft...");
+                const script = document.createElement("script");
+                script.src = "https://unpkg.com/dynamsoft-javascript-barcode@10.4.0/dist/dbr.js"; // Alternative CDN
+                script.async = true;
+
+                script.onload = async () => {
+                    console.log("✅ Dynamsoft Library Loaded Successfully");
+                    Dynamsoft.BarcodeReader.license = "YOUR_LICENSE_KEY_HERE"; // Replace with your actual license key
+                    await Dynamsoft.BarcodeReader.loadWasm();
+                };
+
+                script.onerror = () => {
+                    console.error("❌ Error: Dynamsoft library failed to load.");
+                    alert("Error: Barcode scanner library failed to load.");
+                };
+
+                document.head.appendChild(script);
             } catch (error) {
-                console.error("Dynamsoft initialization error:", error);
-                alert("Error: Barcode scanner library failed to initialize.");
+                console.error("Error loading barcode scanner:", error);
             }
-        });
+        })();
     </script>
+</head>
+
     <style>
         body {
             font-family: Arial, sans-serif;
