@@ -1,5 +1,4 @@
 document.getElementById("scan-button").addEventListener("click", async () => {
-    // Wait for ZXing to be fully available
     if (typeof ZXing === "undefined" || !ZXing.BrowserBarcodeReader) {
         alert("Barcode scanner failed to load. Please refresh and try again.");
         console.error("ZXing is not defined. Make sure it's loaded before index.js runs.");
@@ -8,6 +7,13 @@ document.getElementById("scan-button").addEventListener("click", async () => {
 
     try {
         const codeReader = new ZXing.BrowserBarcodeReader();
+        
+        // Force ZXing to only detect Code 39 (most common VIN barcode format)
+        const hints = new Map();
+        hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
+            ZXing.BarcodeFormat.CODE_39 // VIN barcodes are usually Code 39
+        ]);
+
         const video = document.createElement("video");
         video.setAttribute("playsinline", true);
         video.style.position = "fixed";
@@ -47,9 +53,9 @@ document.getElementById("scan-button").addEventListener("click", async () => {
                 overlay.remove();
                 alert("VIN Scanned: " + result.text);
             } else if (err) {
-                console.log("Scanning... No barcode detected yet.");
+                console.log("Scanning... No VIN barcode detected yet.");
             }
-        });
+        }, hints);  // 👈 Pass barcode format hints for VIN detection
 
     } catch (err) {
         alert("Error accessing camera: " + err.message);
