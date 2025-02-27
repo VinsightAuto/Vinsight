@@ -3,38 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vinsight Auto</title>
-    <link rel="stylesheet" href="style.css">
-
-    <!-- Dynamsoft Script (Deferred) -->
-    <script>
-        var dbrScript = document.createElement("script");
-        dbrScript.src = "https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@latest/dist/dbr.min.js";
-        dbrScript.onload = function() {
-            console.log("Dynamsoft Loaded Successfully");
-        };
-        document.head.appendChild(dbrScript);
-    </script>
-
-    <!-- Link to JavaScript -->
+    <title>Sell Your Car</title>
+    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader@10.2.2/dist/dbr.js"></script>
     <script defer src="index.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f8f8f8;
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: black;
+            color: white;
+            cursor: pointer;
+        }
+        .error, .success {
+            padding: 10px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+    </style>
 </head>
 <body>
-
-    <h1>Want to Sell Your Car?</h1>
-    <p>Get an instant appraisal in minutes</p>
-
     <div class="container">
+        <h2>Want to Sell Your Car?</h2>
+        <p>Get an instant appraisal in minutes</p>
         <button id="scan-button">Scan VIN</button>
         <input type="text" id="vin-input" placeholder="Enter or Scan VIN Number">
-
-        <form id="user-form">
-            <input type="number" placeholder="Mileage" required>
-            <input type="text" placeholder="Full Name" required>
-            <input type="text" placeholder="Phone or Email" required>
-            <button type="submit">Get My Offer</button>
-        </form>
+        <input type="text" id="mileage" placeholder="Mileage">
+        <input type="text" id="full-name" placeholder="Full Name">
+        <input type="text" id="contact" placeholder="Phone or Email">
+        <button id="submit-button">Get My Offer</button>
+        <div id="debug-output"></div>
     </div>
-
 </body>
 </html>
