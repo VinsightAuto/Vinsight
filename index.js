@@ -14,7 +14,7 @@ document.getElementById("scan-button").addEventListener("click", async () => {
         await Dynamsoft.BarcodeReader.loadWasm();
 
         // Create a scanner instance
-        let scanner = await Dynamsoft.BarcodeScanner.createInstance();
+        let scanner = await Dynamsoft.BarcodeReader.createInstance();
 
         // Set barcode formats (supports all VIN barcode types)
         await scanner.updateRuntimeSettings("speed");
