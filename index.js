@@ -1,6 +1,8 @@
 document.getElementById("scan-button").addEventListener("click", async () => {
-    if (typeof ZXing === "undefined") {
+    // Wait for ZXing to be fully available
+    if (typeof ZXing === "undefined" || !ZXing.BrowserBarcodeReader) {
         alert("Barcode scanner failed to load. Please refresh and try again.");
+        console.error("ZXing is not defined. Make sure it's loaded before index.js runs.");
         return;
     }
 
