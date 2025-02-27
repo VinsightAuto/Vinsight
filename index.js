@@ -6,10 +6,10 @@ document.getElementById("scan-button").addEventListener("click", async () => {
             return;
         }
 
-        console.log("Opening barcode scanner...");
+        console.log("📸 Opening barcode scanner...");
         let scanner = await Dynamsoft.BarcodeScanner.createInstance();
         await scanner.updateRuntimeSettings("speed");
-        
+
         // Support VIN barcode formats
         await scanner.setBarcodeFormats([
             Dynamsoft.EnumBarcodeFormat.BF_CODE_39,
@@ -20,7 +20,7 @@ document.getElementById("scan-button").addEventListener("click", async () => {
 
         scanner.onFrameRead = (results) => {
             for (let result of results) {
-                console.log("Scanned VIN:", result.barcodeText);
+                console.log("✅ Scanned VIN:", result.barcodeText);
                 document.getElementById("vin-input").value = result.barcodeText;
                 scanner.hide();
                 scanner.destroy();
@@ -29,7 +29,7 @@ document.getElementById("scan-button").addEventListener("click", async () => {
             }
         };
     } catch (error) {
-        console.error("Camera error:", error);
+        console.error("❌ Camera error:", error);
         alert("Error accessing camera: " + error.message);
     }
 });
