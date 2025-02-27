@@ -6,8 +6,15 @@
     <title>Vinsight Auto</title>
     <link rel="stylesheet" href="style.css">
 
-    <!-- Load Dynamsoft Barcode SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@latest/dist/dbr.min.js"></script>
+    <!-- Dynamsoft Script (Deferred) -->
+    <script>
+        var dbrScript = document.createElement("script");
+        dbrScript.src = "https://cdn.jsdelivr.net/npm/dynamsoft-javascript-barcode@latest/dist/dbr.min.js";
+        dbrScript.onload = function() {
+            console.log("Dynamsoft Loaded Successfully");
+        };
+        document.head.appendChild(dbrScript);
+    </script>
 
     <!-- Link to JavaScript -->
     <script defer src="index.js"></script>
