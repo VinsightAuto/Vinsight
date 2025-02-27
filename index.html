@@ -6,12 +6,9 @@
     <title>Vinsight Auto</title>
     <link rel="stylesheet" href="style.css">
 
-    <!-- ZXing Barcode Scanner -->
-    <script src="https://unpkg.com/@zxing/browser@latest"></script>
-
-    <!-- Link to JavaScript -->
-    <script src="https://unpkg.com/@zxing/browser@latest"></script>
-<script defer src="index.js"></script>
+    <!-- Load ZXing BEFORE index.js -->
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
+    <script defer src="index.js"></script>
 </head>
 <body>
 
