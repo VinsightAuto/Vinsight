@@ -1,51 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sell Your Car</title>
-    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader@10.2.2/dist/dbr.js"></script>
-    <script defer src="index.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f8f8f8;
-        }
-        .container {
-            width: 100%;
-            max-width: 400px;
-            margin: 50px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-        }
-        input, button {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        button {
-            background-color: black;
-            color: white;
-            cursor: pointer;
-        }
-        .error, .success {
-            padding: 10px;
-            margin: 10px 0;
-            font-weight: bold;
-        }
-        .error {
-            color: red;
-        }
-        .success {
-            color: green;
-        }
-    </style>
-</head>
+<script>
+    function loadDynamsoft() {
+        let script = document.createElement("script");
+        script.src = "https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader@10.2.2/dist/dbr.js";
+        script.onload = () => console.log("✅ Dynamsoft Loaded via CDN");
+        script.onerror = () => {
+            console.error("❌ Failed to load from CDN. Trying local backup...");
+            let localScript = document.createElement("script");
+            localScript.src = "/dbr.js"; // Make sure this file exists in your repo
+            document.head.appendChild(localScript);
+        };
+        document.head.appendChild(script);
+    }
+    loadDynamsoft();
+</script>
+
 <body>
     <div class="container">
         <h2>Want to Sell Your Car?</h2>
