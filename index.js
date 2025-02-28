@@ -1,41 +1,69 @@
 document.getElementById("scan-vin").addEventListener("click", () => {
-    document.getElementById("scanner-container").style.display = "block";
-    startScanner();
+    const scannerContainer = document.getElementById("scanner-container");
+    scannerContainer.style.display = "block";
+
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+        .then(stream => {
+            const video = document.getElementById("scanner-video");
+            video.srcObject = stream;
+            video.play();
+            initQuagga();
+        })
+        .catch(err => {
+            alert("Camera access denied or unavailable.");
+            console.error("Camera error:", err);
+        });
 });
 
 document.getElementById("close-scanner").addEventListener("click", () => {
-    document.getElementById("scanner-container").style.display = "none";
-    Quagga.stop();
+    const scannerContainer = document.getElementById("scanner-container");
+    scannerContainer.style.display = "none";
+    stopCamera();
 });
 
-function startScanner() {
+function stopCamera() {
+    let video = document.getElementById("scanner-video");
+    let stream = video.srcObject;
+    if (stream) {
+        let tracks = stream.getTracks();
+        tracks.forEach(track => track.stop());
+    }
+    video.srcObject = null;
+}
+
+function initQuagga() {
     Quagga.init({
         inputStream: {
             name: "Live",
             type: "LiveStream",
-            target: document.querySelector("#scanner-video"),
+            target: document.getElementById("scanner-container"),
             constraints: {
                 width: 640,
                 height: 480,
                 facingMode: "environment"
             }
         },
+        locator: {
+            patchSize: "medium",
+            halfSample: true
+        },
         decoder: {
-            readers: ["code_128_reader", "ean_reader", "upc_reader"] // VIN barcodes are typically Code 128
-        }
+            readers: ["code_128_reader"]
+        },
+        locate: true
     }, function(err) {
         if (err) {
-            console.error("Quagga initialization failed: ", err);
+            console.error("QuaggaJS initialization failed:", err);
             return;
         }
         Quagga.start();
     });
 
-    Quagga.onDetected((data) => {
-        const vin = data.codeResult.code;
-        document.getElementById("vin-input").value = vin;
-        alert("VIN Scanned: " + vin);
-        Quagga.stop();
+    Quagga.onDetected(data => {
+        document.getElementById("vin-input").value = data.codeResult.code;
+        alert("VIN Scanned: " + data.codeResult.code);
+        stopCamera();
         document.getElementById("scanner-container").style.display = "none";
+        Quagga.stop();
     });
 }
