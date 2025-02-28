@@ -3,99 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Get Your Car Appraised</title>
+    <title>VIN Appraisal</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #d946ef, #6366f1);
-            color: white;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .logo {
-            width: 80px;
-            margin-bottom: 10px;
-        }
-
-        h1 {
-            font-size: 24px;
-            margin: 10px 0;
-        }
-
-        p {
-            font-size: 16px;
-        }
-
-        .form-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .form-container input, .form-container button {
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-
-        .scan-button {
-            background-color: #d946ef;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .offer-button {
-            background-color: #6366f1;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .scanner-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            display: none;
-        }
-
-        video {
-            width: 90%;
-            max-width: 400px;
-            border: 2px solid white;
-            border-radius: 10px;
-        }
-
-        #close-scanner {
-            margin-top: 10px;
-            background: red;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-    </style>
 </head>
 <body>
     <div class="container">
@@ -114,50 +24,13 @@
             <button id="get-offer" class="offer-button">Get My Appraisal</button>
         </div>
         
-        <div id="scanner-container" class="scanner-overlay">
-            <video id="scanner-video"></video>
-            <button id="close-scanner">❌ Close</button>
+        <div id="scanner-container" class="scanner-overlay" style="display: none;">
+            <video id="scanner-video" autoplay playsinline></video>
+            <canvas id="scanner-canvas"></canvas>
+            <button id="close-scanner" class="close-button">❌ Close</button>
         </div>
     </div>
-
-    <script>
-        document.getElementById("scan-vin").addEventListener("click", function() {
-            document.getElementById("scanner-container").style.display = "flex";
-            startScanner();
-        });
-
-        document.getElementById("close-scanner").addEventListener("click", function() {
-            document.getElementById("scanner-container").style.display = "none";
-            Quagga.stop();
-        });
-
-        function startScanner() {
-            Quagga.init({
-                inputStream: {
-                    name: "Live",
-                    type: "LiveStream",
-                    target: document.querySelector("#scanner-video"),
-                    constraints: {
-                        facingMode: "environment"
-                    }
-                },
-                decoder: {
-                    readers: ["code_128_reader"] 
-                }
-            }, function(err) {
-                if (err) {
-                    console.error("Error initializing Quagga:", err);
-                    return;
-                }
-                Quagga.start();
-            });
-
-            Quagga.onDetected(function(result) {
-                document.getElementById("vin-input").value = result.codeResult.code;
-                Quagga.stop();
-                document.getElementById("scanner-container").style.display = "none";
-            });
-        }
-    </script>
+    
+    <script src="index.js"></script>
 </body>
 </html>
