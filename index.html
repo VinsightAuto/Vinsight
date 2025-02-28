@@ -4,126 +4,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VIN Scanner</title>
-
-    <!-- Dynamsoft Barcode Reader Library -->
-    <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader@10.4.2/dist/dbr.js"></script>
-
-    <!-- Styles -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
             text-align: center;
-            padding: 50px;
-        }
-        .container {
-            background: white;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            margin: auto;
         }
-        h1 {
-            font-size: 24px;
-        }
-        p {
-            font-size: 14px;
-            color: #666;
-        }
-        button {
-            background-color: black;
-            color: white;
-            padding: 10px;
+        #interactive {
             width: 100%;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 10px 0;
-            font-size: 16px;
+            max-width: 400px;
+            height: 300px;
+            margin: auto;
+            position: relative;
+            border: 2px solid black;
         }
-        button:hover {
-            background-color: #333;
-        }
-        input {
-            width: calc(100% - 20px);
-            padding: 10px;
-            margin: 5px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 14px;
+        video {
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <h1>Want to Sell Your Car?</h1>
-        <p>Get an instant appraisal in minutes</p>
-
-        <button id="scan-button">Scan VIN</button>
-
-        <input type="text" id="vin-input" placeholder="Enter or Scan VIN Number">
-        <input type="text" id="mileage" placeholder="Mileage">
-        <input type="text" id="full-name" placeholder="Full Name">
-        <input type="text" id="contact-info" placeholder="Phone or Email">
-        
-        <button id="submit-button">Get My Offer</button>
-    </div>
-
-    <!-- JavaScript -->
+    <h1>Want to Sell Your Car?</h1>
+    <p>Get an instant appraisal in minutes</p>
+    <button id="scan-vin">Scan VIN</button>
+    <br><br>
+    <input type="text" id="vin-input" placeholder="Enter or Scan VIN Number">
+    <div id="interactive" class="viewport"></div>
+    
     <script>
-        document.getElementById("scan-button").addEventListener("click", async () => {
-            try {
-                // Check if Dynamsoft is available
-                if (typeof Dynamsoft === "undefined" || !Dynamsoft.BarcodeReader) {
-                    alert("Error: Barcode scanner library failed to load.");
-                    console.error("Dynamsoft library is missing.");
+        document.getElementById("scan-vin").addEventListener("click", function() {
+            Quagga.init({
+                inputStream: {
+                    name: "Live",
+                    type: "LiveStream",
+                    target: document.querySelector("#interactive"),
+                    constraints: {
+                        facingMode: "environment"
+                    }
+                },
+                decoder: {
+                    readers: ["code_128_reader", "code_39_reader"]
+                }
+            }, function(err) {
+                if (err) {
+                    console.error("Error initializing Quagga: ", err);
                     return;
                 }
+                Quagga.start();
+            });
+        });
 
-                console.log("Dynamsoft Loaded Successfully");
-
-                // Set API Key
-                Dynamsoft.BarcodeReader.license = "DLS2eyJoYW5kc2hha2VDb2RlIjoiMTAzNzQ1OTg5LVRYbFhaV0pRY205cSIsIm1haW5TZXJ2ZXJVUkwiOiJodHRwczovL21kbHMuZHluYW1zb2Z0b25saW5lLmNvbSIsIm9yZ2FuaXphdGlvbklEIjoiMTAzNzQ1OTg5Iiwic3RhbmRieVNlcnZlclVSTCI6Imh0dHBzOi8vc2Rscy5keW5hbXNvZnRvbmxpbmUuY29tIiwiY2hlY2tDb2RlIjoyMjczOTc0NTJ9";
-
-                // Wait for library to initialize
-                await Dynamsoft.BarcodeReader.loadWasm();
-
-                // Create a scanner instance
-                let scanner = await Dynamsoft.BarcodeScanner.createInstance();
-
-                // Set barcode formats
-                await scanner.updateRuntimeSettings("speed");
-                await scanner.setBarcodeFormats([
-                    Dynamsoft.EnumBarcodeFormat.BF_CODE_39,
-                    Dynamsoft.EnumBarcodeFormat.BF_CODE_128,
-                    Dynamsoft.EnumBarcodeFormat.BF_DATAMATRIX,
-                    Dynamsoft.EnumBarcodeFormat.BF_QR_CODE,
-                    Dynamsoft.EnumBarcodeFormat.BF_AZTEC
-                ]);
-
-                // Open scanner
-                await scanner.show();
-
-                // Handle barcode scanning
-                scanner.onFrameRead = (results) => {
-                    for (let result of results) {
-                        console.log("VIN Scanned: ", result.barcodeText);
-                        document.getElementById("vin-input").value = result.barcodeText;
-                        alert("VIN Scanned: " + result.barcodeText);
-                        scanner.hide();
-                        scanner.destroy();
-                        break;
-                    }
-                };
-
-            } catch (err) {
-                alert("Error accessing camera: " + err.message);
-                console.error("Camera error:", err);
-            }
+        Quagga.onDetected(function(data) {
+            let vin = data.codeResult.code;
+            document.getElementById("vin-input").value = vin;
+            alert("VIN Scanned: " + vin);
+            Quagga.stop();
         });
     </script>
-
 </body>
 </html>
