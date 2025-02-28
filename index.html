@@ -25,19 +25,19 @@
         </div>
         
         <div id="scanner-container" class="scanner-overlay" style="display: none;">
-            <video id="scanner-video"></video>
+            <video id="scanner-video" autoplay></video>
             <div id="scanner-frame"></div>
             <button id="close-scanner">❌ Close</button>
         </div>
     </div>
 
     <script>
-        document.getElementById("scan-vin").addEventListener("click", function() {
+        document.getElementById("scan-vin").addEventListener("click", () => {
             document.getElementById("scanner-container").style.display = "block";
             startScanner();
         });
-
-        document.getElementById("close-scanner").addEventListener("click", function() {
+        
+        document.getElementById("close-scanner").addEventListener("click", () => {
             document.getElementById("scanner-container").style.display = "none";
             Quagga.stop();
         });
@@ -45,17 +45,14 @@
         function startScanner() {
             Quagga.init({
                 inputStream: {
-                    name: "Live",
                     type: "LiveStream",
                     target: document.querySelector("#scanner-video"),
                     constraints: {
-                        width: 640,
-                        height: 480,
                         facingMode: "environment"
                     }
                 },
                 decoder: {
-                    readers: ["code_128_reader"]
+                    readers: ["code_128_reader"] // VIN barcodes use Code 128
                 }
             }, function(err) {
                 if (err) {
@@ -64,13 +61,13 @@
                 }
                 Quagga.start();
             });
-
-            Quagga.onDetected(function(result) {
-                let vin = result.codeResult.code;
-                console.log("VIN Detected:", vin);
+            
+            Quagga.onDetected((result) => {
+                const vin = result.codeResult.code;
                 document.getElementById("vin-input").value = vin;
-                document.getElementById("scanner-container").style.display = "none";
                 Quagga.stop();
+                document.getElementById("scanner-container").style.display = "none";
+                alert("VIN Scanned: " + vin);
             });
         }
     </script>
