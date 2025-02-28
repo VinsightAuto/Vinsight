@@ -3,65 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIN Scanner</title>
+    <title>Sell Your Car - VIN Scanner</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
-        }
-        #interactive {
-            width: 100%;
-            max-width: 400px;
-            height: 300px;
-            margin: auto;
-            position: relative;
-            border: 2px solid black;
-        }
-        video {
-            width: 100%;
-            height: 100%;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Want to Sell Your Car?</h1>
-    <p>Get an instant appraisal in minutes</p>
-    <button id="scan-vin">Scan VIN</button>
-    <br><br>
-    <input type="text" id="vin-input" placeholder="Enter or Scan VIN Number">
-    <div id="interactive" class="viewport"></div>
-    
-    <script>
-        document.getElementById("scan-vin").addEventListener("click", function() {
-            Quagga.init({
-                inputStream: {
-                    name: "Live",
-                    type: "LiveStream",
-                    target: document.querySelector("#interactive"),
-                    constraints: {
-                        facingMode: "environment"
-                    }
-                },
-                decoder: {
-                    readers: ["code_128_reader", "code_39_reader"]
-                }
-            }, function(err) {
-                if (err) {
-                    console.error("Error initializing Quagga: ", err);
-                    return;
-                }
-                Quagga.start();
-            });
-        });
 
-        Quagga.onDetected(function(data) {
-            let vin = data.codeResult.code;
-            document.getElementById("vin-input").value = vin;
-            alert("VIN Scanned: " + vin);
-            Quagga.stop();
-        });
-    </script>
+    <div class="container">
+        <h1>Want to Sell Your Car?</h1>
+        <p>Get an instant appraisal in minutes</p>
+
+        <button id="scan-button">📷 Scan VIN</button>
+        
+        <input type="text" id="vin-input" placeholder="Enter or Scan VIN Number" readonly>
+        <input type="text" id="mileage" placeholder="Mileage">
+        <input type="text" id="full-name" placeholder="Full Name">
+        <input type="text" id="contact" placeholder="Phone or Email">
+        
+        <button id="submit-button">Get My Offer</button>
+
+        <div id="scanner-container" class="scanner-hidden"></div>
+    </div>
+
 </body>
 </html>
