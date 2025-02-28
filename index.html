@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIN Appraisal</title>
+    <title>Get Your Car Appraised</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <style>
@@ -20,7 +20,7 @@
             max-width: 600px;
             margin: 50px auto;
             padding: 20px;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
@@ -77,6 +77,7 @@
             justify-content: center;
             align-items: center;
             flex-direction: column;
+            display: none;
         }
 
         video {
@@ -100,8 +101,8 @@
     <div class="container">
         <header>
             <img src="logo.png" alt="Company Logo" class="logo">
-            <h1>Want to Sell Your Car?</h1>
-            <p>Get an instant appraisal in minutes</p>
+            <h1>Get an Accurate Appraisal for Your Car</h1>
+            <p>Find out your car's true value in minutes</p>
         </header>
         
         <div class="form-container">
@@ -110,15 +111,53 @@
             <input type="text" id="mileage" placeholder="Mileage">
             <input type="text" id="fullname" placeholder="Full Name">
             <input type="text" id="contact" placeholder="Phone or Email">
-            <button id="get-offer" class="offer-button">Get My Offer</button>
+            <button id="get-offer" class="offer-button">Get My Appraisal</button>
         </div>
         
-        <div id="scanner-container" class="scanner-overlay" style="display: none;">
+        <div id="scanner-container" class="scanner-overlay">
             <video id="scanner-video"></video>
             <button id="close-scanner">❌ Close</button>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        document.getElementById("scan-vin").addEventListener("click", function() {
+            document.getElementById("scanner-container").style.display = "flex";
+            startScanner();
+        });
+
+        document.getElementById("close-scanner").addEventListener("click", function() {
+            document.getElementById("scanner-container").style.display = "none";
+            Quagga.stop();
+        });
+
+        function startScanner() {
+            Quagga.init({
+                inputStream: {
+                    name: "Live",
+                    type: "LiveStream",
+                    target: document.querySelector("#scanner-video"),
+                    constraints: {
+                        facingMode: "environment"
+                    }
+                },
+                decoder: {
+                    readers: ["code_128_reader"] 
+                }
+            }, function(err) {
+                if (err) {
+                    console.error("Error initializing Quagga:", err);
+                    return;
+                }
+                Quagga.start();
+            });
+
+            Quagga.onDetected(function(result) {
+                document.getElementById("vin-input").value = result.codeResult.code;
+                Quagga.stop();
+                document.getElementById("scanner-container").style.display = "none";
+            });
+        }
+    </script>
 </body>
 </html>
