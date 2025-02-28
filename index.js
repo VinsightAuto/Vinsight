@@ -1,46 +1,19 @@
-document.getElementById("scan-button").addEventListener("click", () => {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        alert("Camera access is not supported on this device.");
-        return;
-    }
+document.getElementById("scan-vin").addEventListener("click", () => {
+    document.getElementById("scanner-container").style.display = "block";
+    startScanner();
+});
 
-    let scannerContainer = document.createElement("div");
-    scannerContainer.id = "scanner-container";
-    scannerContainer.style.position = "fixed";
-    scannerContainer.style.top = "0";
-    scannerContainer.style.left = "0";
-    scannerContainer.style.width = "100vw";
-    scannerContainer.style.height = "100vh";
-    scannerContainer.style.background = "rgba(0, 0, 0, 0.8)";
-    scannerContainer.style.display = "flex";
-    scannerContainer.style.justifyContent = "center";
-    scannerContainer.style.alignItems = "center";
-    scannerContainer.style.zIndex = "1000";
-    
-    let closeButton = document.createElement("button");
-    closeButton.textContent = "Close Scanner";
-    closeButton.style.position = "absolute";
-    closeButton.style.top = "20px";
-    closeButton.style.right = "20px";
-    closeButton.style.padding = "10px 15px";
-    closeButton.style.background = "#ff0000";
-    closeButton.style.color = "#fff";
-    closeButton.style.border = "none";
-    closeButton.style.cursor = "pointer";
-    
-    closeButton.addEventListener("click", () => {
-        Quagga.stop();
-        scannerContainer.remove();
-    });
+document.getElementById("close-scanner").addEventListener("click", () => {
+    document.getElementById("scanner-container").style.display = "none";
+    Quagga.stop();
+});
 
-    scannerContainer.appendChild(closeButton);
-    document.body.appendChild(scannerContainer);
-
+function startScanner() {
     Quagga.init({
         inputStream: {
             name: "Live",
             type: "LiveStream",
-            target: scannerContainer,
+            target: document.querySelector("#scanner-video"),
             constraints: {
                 width: 640,
                 height: 480,
@@ -48,25 +21,21 @@ document.getElementById("scan-button").addEventListener("click", () => {
             }
         },
         decoder: {
-            readers: ["code_128_reader"]
+            readers: ["code_128_reader", "ean_reader", "upc_reader"] // VIN barcodes are typically Code 128
         }
-    }, (err) => {
+    }, function(err) {
         if (err) {
-            console.error("Error initializing Quagga:", err);
-            alert("Failed to initialize barcode scanner.");
-            scannerContainer.remove();
+            console.error("Quagga initialization failed: ", err);
             return;
         }
         Quagga.start();
     });
 
-    Quagga.onDetected((result) => {
-        let vin = result.codeResult.code;
-        if (vin.length >= 17) {
-            document.getElementById("vin-input").value = vin;
-            alert("VIN Scanned: " + vin);
-            Quagga.stop();
-            scannerContainer.remove();
-        }
+    Quagga.onDetected((data) => {
+        const vin = data.codeResult.code;
+        document.getElementById("vin-input").value = vin;
+        alert("VIN Scanned: " + vin);
+        Quagga.stop();
+        document.getElementById("scanner-container").style.display = "none";
     });
-});
+}
