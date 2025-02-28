@@ -6,6 +6,95 @@
     <title>VIN Appraisal</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #d946ef, #6366f1);
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            width: 80px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin: 10px 0;
+        }
+
+        p {
+            font-size: 16px;
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .form-container input, .form-container button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .scan-button {
+            background-color: #d946ef;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .offer-button {
+            background-color: #6366f1;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .scanner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        video {
+            width: 90%;
+            max-width: 400px;
+            border: 2px solid white;
+            border-radius: 10px;
+        }
+
+        #close-scanner {
+            margin-top: 10px;
+            background: red;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -26,44 +115,10 @@
         
         <div id="scanner-container" class="scanner-overlay" style="display: none;">
             <video id="scanner-video"></video>
-            <canvas id="scanner-canvas"></canvas>
-            <div id="scanner-frame"></div>
             <button id="close-scanner">❌ Close</button>
         </div>
     </div>
 
-    <script>
-        document.getElementById("scan-vin").addEventListener("click", () => {
-            document.getElementById("scanner-container").style.display = "block";
-            Quagga.init({
-                inputStream: {
-                    name: "Live",
-                    type: "LiveStream",
-                    target: document.querySelector("#scanner-video")
-                },
-                decoder: {
-                    readers: ["code_128_reader"] // Most VIN barcodes are Code 128
-                }
-            }, function(err) {
-                if (err) {
-                    console.error("QuaggaJS initialization error:", err);
-                    return;
-                }
-                Quagga.start();
-            });
-        });
-
-        Quagga.onDetected((data) => {
-            document.getElementById("vin-input").value = data.codeResult.code;
-            alert("VIN Scanned: " + data.codeResult.code);
-            Quagga.stop();
-            document.getElementById("scanner-container").style.display = "none";
-        });
-
-        document.getElementById("close-scanner").addEventListener("click", () => {
-            Quagga.stop();
-            document.getElementById("scanner-container").style.display = "none";
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
