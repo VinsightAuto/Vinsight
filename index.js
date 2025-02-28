@@ -1,35 +1,72 @@
-document.getElementById("scan-button").addEventListener("click", async () => {
-    try {
-        if (typeof Dynamsoft === "undefined" || !Dynamsoft.BarcodeScanner) {
-            alert("Error: Barcode scanner failed to load. Refresh and try again.");
-            console.error("Dynamsoft library is not available.");
+document.getElementById("scan-button").addEventListener("click", () => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert("Camera access is not supported on this device.");
+        return;
+    }
+
+    let scannerContainer = document.createElement("div");
+    scannerContainer.id = "scanner-container";
+    scannerContainer.style.position = "fixed";
+    scannerContainer.style.top = "0";
+    scannerContainer.style.left = "0";
+    scannerContainer.style.width = "100vw";
+    scannerContainer.style.height = "100vh";
+    scannerContainer.style.background = "rgba(0, 0, 0, 0.8)";
+    scannerContainer.style.display = "flex";
+    scannerContainer.style.justifyContent = "center";
+    scannerContainer.style.alignItems = "center";
+    scannerContainer.style.zIndex = "1000";
+    
+    let closeButton = document.createElement("button");
+    closeButton.textContent = "Close Scanner";
+    closeButton.style.position = "absolute";
+    closeButton.style.top = "20px";
+    closeButton.style.right = "20px";
+    closeButton.style.padding = "10px 15px";
+    closeButton.style.background = "#ff0000";
+    closeButton.style.color = "#fff";
+    closeButton.style.border = "none";
+    closeButton.style.cursor = "pointer";
+    
+    closeButton.addEventListener("click", () => {
+        Quagga.stop();
+        scannerContainer.remove();
+    });
+
+    scannerContainer.appendChild(closeButton);
+    document.body.appendChild(scannerContainer);
+
+    Quagga.init({
+        inputStream: {
+            name: "Live",
+            type: "LiveStream",
+            target: scannerContainer,
+            constraints: {
+                width: 640,
+                height: 480,
+                facingMode: "environment"
+            }
+        },
+        decoder: {
+            readers: ["code_128_reader"]
+        }
+    }, (err) => {
+        if (err) {
+            console.error("Error initializing Quagga:", err);
+            alert("Failed to initialize barcode scanner.");
+            scannerContainer.remove();
             return;
         }
+        Quagga.start();
+    });
 
-        console.log("📸 Opening barcode scanner...");
-        let scanner = await Dynamsoft.BarcodeScanner.createInstance();
-        await scanner.updateRuntimeSettings("speed");
-
-        // Support VIN barcode formats
-        await scanner.setBarcodeFormats([
-            Dynamsoft.EnumBarcodeFormat.BF_CODE_39,
-            Dynamsoft.EnumBarcodeFormat.BF_CODE_128
-        ]);
-
-        await scanner.show();
-
-        scanner.onFrameRead = (results) => {
-            for (let result of results) {
-                console.log("✅ Scanned VIN:", result.barcodeText);
-                document.getElementById("vin-input").value = result.barcodeText;
-                scanner.hide();
-                scanner.destroy();
-                alert("VIN Scanned: " + result.barcodeText);
-                break;
-            }
-        };
-    } catch (error) {
-        console.error("❌ Camera error:", error);
-        alert("Error accessing camera: " + error.message);
-    }
+    Quagga.onDetected((result) => {
+        let vin = result.codeResult.code;
+        if (vin.length >= 17) {
+            document.getElementById("vin-input").value = vin;
+            alert("VIN Scanned: " + vin);
+            Quagga.stop();
+            scannerContainer.remove();
+        }
+    });
 });
