@@ -25,7 +25,8 @@
         </div>
         
         <div id="scanner-container" class="scanner-overlay" style="display: none;">
-            <video id="scanner-video" autoplay></video>
+            <video id="scanner-video"></video>
+            <canvas id="scanner-canvas"></canvas>
             <div id="scanner-frame"></div>
             <button id="close-scanner">❌ Close</button>
         </div>
@@ -34,42 +35,35 @@
     <script>
         document.getElementById("scan-vin").addEventListener("click", () => {
             document.getElementById("scanner-container").style.display = "block";
-            startScanner();
-        });
-        
-        document.getElementById("close-scanner").addEventListener("click", () => {
-            document.getElementById("scanner-container").style.display = "none";
-            Quagga.stop();
-        });
-
-        function startScanner() {
             Quagga.init({
                 inputStream: {
+                    name: "Live",
                     type: "LiveStream",
-                    target: document.querySelector("#scanner-video"),
-                    constraints: {
-                        facingMode: "environment"
-                    }
+                    target: document.querySelector("#scanner-video")
                 },
                 decoder: {
-                    readers: ["code_128_reader"] // VIN barcodes use Code 128
+                    readers: ["code_128_reader"] // Most VIN barcodes are Code 128
                 }
             }, function(err) {
                 if (err) {
-                    console.error("Quagga initialization failed:", err);
+                    console.error("QuaggaJS initialization error:", err);
                     return;
                 }
                 Quagga.start();
             });
-            
-            Quagga.onDetected((result) => {
-                const vin = result.codeResult.code;
-                document.getElementById("vin-input").value = vin;
-                Quagga.stop();
-                document.getElementById("scanner-container").style.display = "none";
-                alert("VIN Scanned: " + vin);
-            });
-        }
+        });
+
+        Quagga.onDetected((data) => {
+            document.getElementById("vin-input").value = data.codeResult.code;
+            alert("VIN Scanned: " + data.codeResult.code);
+            Quagga.stop();
+            document.getElementById("scanner-container").style.display = "none";
+        });
+
+        document.getElementById("close-scanner").addEventListener("click", () => {
+            Quagga.stop();
+            document.getElementById("scanner-container").style.display = "none";
+        });
     </script>
 </body>
 </html>
