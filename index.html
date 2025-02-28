@@ -6,6 +6,81 @@
     <title>VIN Appraisal</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #d0b3ff, #ff8fd3, #9ab7ff);
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .logo {
+            width: 80px;
+            margin-bottom: 10px;
+        }
+        .scan-button, .offer-button {
+            background: #9b51e0;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .scan-button:hover, .offer-button:hover {
+            background: #7a3db8;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .scanner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        #scanner-video {
+            width: 90%;
+            max-width: 400px;
+            border: 4px solid #ff8fd3;
+            border-radius: 10px;
+        }
+        #scanner-frame {
+            width: 80%;
+            height: 50px;
+            border: 2px dashed #fff;
+            margin-top: -30px;
+        }
+        #close-scanner {
+            background: red;
+            color: white;
+            border: none;
+            padding: 10px;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
